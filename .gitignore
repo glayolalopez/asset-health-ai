@@ -1,0 +1,28 @@
+# .gitignore
+# Specifies intentionally untracked files to ignore.
+
+# --- Backend ---
+# NEVER commit the n8n data directory. It contains sensitive credentials,
+# execution logs, and a sqlite database that will cause merge conflicts.
+backend/n8n_data/
+
+# --- Frontend ---
+# Ignore dependency directories installed by npm/yarn.
+frontend/node_modules/
+
+# Ignore the production build output directory.
+frontend/dist/
+
+# Ignore local environment variables.
+frontend/.env*
+
+# --- General ---
+# Ignore macOS system files
+.DS_Store
+
+# Ignore Windows thumbnail cache
+Thumbs.db
+
+# Ignore log files
+*.log
+npm-debug.log*

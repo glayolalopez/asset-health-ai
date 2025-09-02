@@ -1,0 +1,30 @@
+# /backend/docker-compose.yml
+# Defines the services, networks, and volumes for our Docker application.
+
+
+services:
+  n8n:
+    # Use the official n8n Docker image.
+    image: n8nio/n8n
+
+    # Assign a unique, human-readable name to the container for easy management.
+    container_name: assethealth_ai_n8n
+
+    # Always restart the container if it stops, ensuring the service is always available.
+    restart: always
+
+    # Map port 5679 on the host machine to port 5678 inside the container.
+    # Using a non-standard host port (5679) prevents conflicts with other n8n instances.
+    ports:
+      - "5678:5678"
+
+    # Mount a local directory into the container to persist n8n data.
+    # This ensures that your workflows and credentials are not lost when the container is restarted.
+    # './n8n_data' is a local folder inside '/backend'. '/home/node/.n8n' is the data path inside the container.
+    volumes:
+      - ./n8n_data:/home/node/.n8n
+
+    # Set environment variables inside the container.
+    environment:
+      - GENERIC_TIMEZONE=Europe/Madrid # Set the timezone to ensure consistent date/time operations.
+      - N8N_CORS_ALLOWED_ORIGINS=http://localhost:5173
