@@ -1,0 +1,202 @@
+{
+  "name": "CreateLabel",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "55f3e5d2-0690-4584-8359-2c21108621bf",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "80a0ce8b-506c-414e-b6c3-d70ca00538ee",
+      "name": "Webhook",
+      "webhookId": "55f3e5d2-0690-4584-8359-2c21108621bf"
+    },
+    {
+      "parameters": {
+        "url": "=https://gnc.corp.equinix.com/gateway/gnc-port-service/restservice/v1/svc/getMappingByPortId/1017970",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        128,
+        0
+      ],
+      "id": "2eb263af-6291-4ac8-8b9b-7037e01539a5",
+      "name": "GNC - Get Info",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "6jP8jFmXrkqsGWop",
+          "name": "Equinix GNC API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.qrserver.com/v1/create-qr-code/",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "Size",
+              "value": "250x250"
+            },
+            {
+              "name": "data",
+              "value": "=Port Name:{{ $json.portName }} \\nPort ID: {{ $json.portID }}\\nProduct:{{ $json.product }} "
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        384,
+        0
+      ],
+      "id": "a20d00a3-25e5-47f1-937d-9b5f7bbdae37",
+      "name": "Create QR"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8cbfc303-62a4-476c-bd1d-fc5b7f5c40dc",
+              "name": "portName",
+              "value": "={{ $json.response[0].portName }}",
+              "type": "string"
+            },
+            {
+              "id": "7c5d221a-19ab-47e8-a901-5aa0af0d8cfd",
+              "name": "portID",
+              "value": "={{ $json.response[0].portId }}",
+              "type": "number"
+            },
+            {
+              "id": "8053f098-dd1e-47b5-ba0b-ed32df867bb1",
+              "name": "product",
+              "value": "={{ $json.response[0].productMapInfo }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        256,
+        0
+      ],
+      "id": "8196974c-576d-452f-8c4d-3e41e23430ea",
+      "name": "Set Data"
+    },
+    {
+      "parameters": {
+        "respondWith": "binary",
+        "responseDataSource": "set",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "image/png"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        512,
+        0
+      ],
+      "id": "7cffe6db-879b-4990-879c-b496cf6675ae",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "GNC - Get Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GNC - Get Info": {
+      "main": [
+        [
+          {
+            "node": "Set Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Data": {
+      "main": [
+        [
+          {
+            "node": "Create QR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create QR": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a1d21708-830b-4d3e-a2e4-bb842ae9b9d7",
+  "meta": {
+    "instanceId": "0fb70fb450834a777d8b0088b348df73a8d452f81e5fc37eafd491d3f470d7d1"
+  },
+  "id": "MBtvE27S6H928Yqu",
+  "tags": []
+}
