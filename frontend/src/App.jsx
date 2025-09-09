@@ -19,7 +19,10 @@ function App() {
   const [qrCodeUrl, setQrCodeUrl] = useState(null); // Stores the URL of the generated QR code image.
 
   // --- CONFIGURATION ---
+  // PRODUCTION URL
   const N8N_WEBHOOK_URL = "http://localhost:5678/webhook/55f3e5d2-0690-4584-8359-2c21108621bf";
+  // TESTING URL:
+  //const N8N_WEBHOOK_URL = "http://localhost:5678/webhook-test/55f3e5d2-0690-4584-8359-2c21108621bf";
 
   // Handles the form submission event.
   const handleSubmit = async (event) => {

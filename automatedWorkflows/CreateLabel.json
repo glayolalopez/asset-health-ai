@@ -36,8 +36,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        128,
-        0
+        592,
+        -80
       ],
       "id": "2eb263af-6291-4ac8-8b9b-7037e01539a5",
       "name": "GNC - Get Info",
@@ -60,11 +60,12 @@
             },
             {
               "name": "data",
-              "value": "=Port Name:{{ $json.portName }} \\nPort ID: {{ $json.portID }}\\nProduct:{{ $json.product }} "
+              "value": "=Asset ID: {{ $json.assetID }}\\nAsset Number: {{ $json.assetNumber }}\\nPart Name: {{ $json.partName }}\\nAsset Status: {{ $json.assetStatus }}\\nOrder Number: {{ $json.orderNumber }}\\nAccount Name: {{ $json.accountName }}\\nAccount Number: {{ $json.accountNumber }}\\n\\n--- Switch Details ---\\nSwitch Name: {{ $json.switchName }}\\nPort Name: {{ $json.portName }}\\nPort: {{ $json.port }}\\nPort Instance ID: {{ $json.portInstance }}\\nSwitch Instance ID: {{ $json.switchInstance }}\\nIBX: {{ $json.ibx }}\\nCage: {{ $json.cage }}"
             }
           ]
         },
         "options": {
+          "allowUnauthorizedCerts": true,
           "response": {
             "response": {
               "responseFormat": "file"
@@ -75,46 +76,11 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        384,
-        0
+        592,
+        80
       ],
       "id": "a20d00a3-25e5-47f1-937d-9b5f7bbdae37",
       "name": "Create QR"
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "8cbfc303-62a4-476c-bd1d-fc5b7f5c40dc",
-              "name": "portName",
-              "value": "={{ $json.response[0].portName }}",
-              "type": "string"
-            },
-            {
-              "id": "7c5d221a-19ab-47e8-a901-5aa0af0d8cfd",
-              "name": "portID",
-              "value": "={{ $json.response[0].portId }}",
-              "type": "number"
-            },
-            {
-              "id": "8053f098-dd1e-47b5-ba0b-ed32df867bb1",
-              "name": "product",
-              "value": "={{ $json.response[0].productMapInfo }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        256,
-        0
-      ],
-      "id": "8196974c-576d-452f-8c4d-3e41e23430ea",
-      "name": "Set Data"
     },
     {
       "parameters": {
@@ -135,11 +101,52 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.4,
       "position": [
-        512,
+        736,
         0
       ],
       "id": "7cffe6db-879b-4990-879c-b496cf6675ae",
       "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/files/Equinix_Connect_Port_Active_Assets.xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        144,
+        0
+      ],
+      "id": "08a4f379-0d2d-4915-83fd-2130a2ded2f8",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        304,
+        0
+      ],
+      "id": "ba606193-83b6-4598-81fa-2ea0d9de8164",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the asset ID to search for from the webhook's query parameters.\nconst assetIdToFind = $('Webhook').first().json.query.assetId;\n\n// Get all input items that are coming into this node.\nconst allItems = $input.all();\n\n// Prepare an array to hold our final result.\nconst results = [];\n\n// Find the single item in the array whose 'ASSETID' matches the one from the webhook.\n// The .find() method is efficient for finding the first match.\nconst matchedItem = allItems.find(item => item.json.ASSETID === assetIdToFind);\n\n// Check if a matching item was actually found before trying to access its data.\nif (matchedItem) {\n\n  // If a match is found, create a new object with only the fields we need.\n  results.push({\n    json: {\n      // --- Asset Information ---\n      assetID: matchedItem.json[\"ASSETID\"],\n      assetNumber: matchedItem.json[\"ASSETNUMBER\"],\n      assetCreated: matchedItem.json[\"ASSETCREATED\"],\n      par: matchedItem.json[\"PAR#\"],\n      assetStatus: matchedItem.json[\"ASSETSTATUS\"],\n      partName: matchedItem.json[\"PARTNAME\"],\n      orderNumber: matchedItem.json[\"ORDERNUMBER\"],\n\n      // --- Account Information ---\n      accountName: matchedItem.json[\"ACCOUNTNAME\"],\n      accountNumber: matchedItem.json[\"ACCOUNTNUMBER\"],\n\n      // --- Switch and Port Details ---\n      switchName: matchedItem.json[\"Switch Name\"],\n      portName: matchedItem.json[\"Switch Port Name\"],\n      port: matchedItem.json[\"Switch Port\"],\n      portInstance: matchedItem.json[\"Switch Port Instance ID\"],\n      switchInstance: matchedItem.json[\"Switch Name Instance ID\"],\n      ibx: matchedItem.json[\"Switch IBX\"],\n      cage: matchedItem.json[\"Switch Cage\"]\n    }\n  });\n}\n\n// Return the final array.\n// This will contain one item if a match was found, or be empty if no match was found.\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "e5730164-9416-4f26-8997-297bb6137242",
+      "name": "Find Asset"
     }
   ],
   "pinData": {},
@@ -148,7 +155,7 @@
       "main": [
         [
           {
-            "node": "GNC - Get Info",
+            "node": "Read/Write Files from Disk",
             "type": "main",
             "index": 0
           }
@@ -159,18 +166,7 @@
       "main": [
         [
           {
-            "node": "Set Data",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Set Data": {
-      "main": [
-        [
-          {
-            "node": "Create QR",
+            "node": "Respond to Webhook",
             "type": "main",
             "index": 0
           }
@@ -187,14 +183,48 @@
           }
         ]
       ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Find Asset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Asset": {
+      "main": [
+        [
+          {
+            "node": "Create QR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "a1d21708-830b-4d3e-a2e4-bb842ae9b9d7",
+  "versionId": "cb049c91-0f45-4eaf-9709-2ea75cf8d8fc",
   "meta": {
+    "templateCredsSetupCompleted": true,
     "instanceId": "0fb70fb450834a777d8b0088b348df73a8d452f81e5fc37eafd491d3f470d7d1"
   },
   "id": "MBtvE27S6H928Yqu",

@@ -23,8 +23,9 @@ services:
     # './n8n_data' is a local folder inside '/backend'. '/home/node/.n8n' is the data path inside the container.
     volumes:
       - ./n8n_data:/home/node/.n8n
-
+      - ./data:/files
     # Set environment variables inside the container.
     environment:
       - GENERIC_TIMEZONE=Europe/Madrid # Set the timezone to ensure consistent date/time operations.
       - N8N_CORS_ALLOWED_ORIGINS=http://localhost:5173
+      - N8N_READ_FILE_ALLOWLIST=/home/node/.n8n/**
