@@ -170,7 +170,7 @@ export function QRScanSection({ onScanComplete, onManualEntry }: QRScanSectionPr
             {qrCodeUrl && (
               <div className="bg-muted/50 p-4 rounded-lg flex flex-col items-center space-y-4 animate-fade-in">
                 <h3 className="text-sm font-semibold text-foreground">QR Generated Successfully!</h3>
-                <img src={qrCodeUrl} alt="Generated QR Code" className="rounded-lg max-w-xs w-full" />
+                <img src={qrCodeUrl} alt="Generated QR Code" className="rounded-lg w-32 h-32" />
                 <Button asChild size="sm" className="w-full">
                   <a 
                     href={qrCodeUrl} 
