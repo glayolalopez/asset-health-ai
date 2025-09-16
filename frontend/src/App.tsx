@@ -3,9 +3,7 @@ import { Navigation } from "./components/Navigation";
 import { QRScanSection } from "./components/QRScanSection";
 import { AssetDetailSection } from "./components/AssetDetailSection";
 import { Dashboard } from "./components/Dashboard";
-import { ManualEntryForm } from "./components/ManualEntryForm";
-
-type View = "scan" | "details" | "dashboard" | "reports" | "settings" | "manual-entry";
+type View = "scan" | "details" | "dashboard" | "reports" | "settings";
 
 export default function App() {
   const [currentView, setCurrentView] = useState<View>("dashboard");
@@ -30,20 +28,12 @@ export default function App() {
     setSelectedAssetId(null);
   };
 
-  const handleManualEntry = () => {
-    setCurrentView("manual-entry");
-  };
 
-  const handleSaveAsset = (assetData: any) => {
-    // In a real app, this would save the asset to a database
-    alert(`Asset ${assetData.assetId} saved successfully!`);
-    setCurrentView("scan");
-  };
 
   const renderContent = () => {
     switch (currentView) {
       case "scan":
-        return <QRScanSection onScanComplete={handleScanComplete} onManualEntry={handleManualEntry} />;
+        return <QRScanSection onScanComplete={handleScanComplete} />;
       case "details":
         return (
           <AssetDetailSection 
@@ -52,13 +42,7 @@ export default function App() {
             onBack={handleBackToScan}
           />
         );
-      case "manual-entry":
-        return (
-          <ManualEntryForm 
-            onBack={handleBackToScan}
-            onSave={handleSaveAsset}
-          />
-        );
+
       case "dashboard":
         return <Dashboard />;
       case "reports":

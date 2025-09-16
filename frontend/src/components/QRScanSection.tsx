@@ -9,10 +9,10 @@ import { Label } from "./ui/label";
 
 interface QRScanSectionProps {
   onScanComplete: (assetId: string) => void;
-  onManualEntry?: () => void;
+  onManualEntry?: () => void; // Prop opcional para la entrada manual
 }
 
-// A reusable SVG spinner component for indicating loading states.
+// Un componente SVG reutilizable para indicar estados de carga.
 const LoadingSpinner = () => (
   <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -21,70 +21,57 @@ const LoadingSpinner = () => (
 );
 
 export function QRScanSection({ onScanComplete, onManualEntry }: QRScanSectionProps) {
-  // State for the Quick Lookup functionality.
+  // Estado para la funcionalidad de Búsqueda Rápida.
   const [quickLookupId, setQuickLookupId] = useState("");
 
-  // --- Start: Logic migrated from the old project ---
+  // --- Lógica para la generación de QR ---
+  const [assetId, setAssetId] = useState(''); // Almacena la entrada del usuario para el generador.
+  const [isLoading, setIsLoading] = useState<boolean>(false); // Gestiona el estado de carga del formulario.
+  const [error, setError] = useState<string | null>(null); // Almacena cualquier mensaje de error.
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null); // Almacena la URL de la imagen del QR generado.
 
-  // State variables to manage the QR generator's data and UI status.
-  const [assetId, setAssetId] = useState(''); // Stores the user's input for the generator.
-  const [isLoading, setIsLoading] = useState<boolean>(false); // Manages the loading state of the form.
-  const [error, setError] = useState<string | null>(null); // Stores any error messages.
-  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null); // Stores the URL of the generated QR code image.
-
-  // The n8n webhook URL for QR code generation.
+  // URL del webhook de n8n para la generación de códigos QR.
   const N8N_WEBHOOK_URL = "http://localhost:5678/webhook/55f3e5d2-0690-4584-8359-2c21108621bf";
 
-  // Handles the QR code generation form submission.
+  // Maneja el envío del formulario para generar el QR.
   const handleGenerateQrClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault(); // Prevent default form submission behavior.
+    event.preventDefault();
     
-    // Simple validation to ensure the Asset ID is not empty.
     if (!assetId) {
-      setError("Asset ID cannot be empty.");
+      setError("El Asset ID no puede estar vacío.");
       return;
     }
     
-    // Reset state for a new request.
     setIsLoading(true);
     setError(null);
     setQrCodeUrl(null);
 
     try {
-      // Make an asynchronous request to the n8n webhook.
       const response = await fetch(`${N8N_WEBHOOK_URL}?assetId=${assetId}`);
-
-      // Check if the HTTP response was successful.
       if (!response.ok) {
-        throw new Error(`HTTP Error: ${response.status}. The asset might not exist.`);
+        throw new Error(`Error HTTP: ${response.status}. El activo podría no existir.`);
       }
-
-      // n8n returns the image data as a 'blob'.
       const imageBlob = await response.blob();
-      // Create a temporary local URL for the blob to use as an image source.
       const imageUrl = URL.createObjectURL(imageBlob);
-      
       setQrCodeUrl(imageUrl);
-
     } catch (err: any) {
-      // If any error occurs during the fetch, store the error message.
       setError(err.message);
     } finally {
-      // This block runs regardless of success or failure.
       setIsLoading(false);
     }
   };
   
-  // --- End: Logic migrated from the old project ---
-  
+  // Manejador para el botón de entrada manual.
   const handleManualEntryClick = () => {
     if (onManualEntry) {
       onManualEntry();
     } else {
-      alert("Manual entry form would be opened here");
+      // Fallback si la prop no se proporciona.
+      alert("Aquí se abriría el formulario de entrada manual.");
     }
   };
 
+  // Manejador para la búsqueda rápida.
   const handleQuickLookup = () => {
     if (quickLookupId.trim()) {
       onScanComplete(quickLookupId.trim());
@@ -94,7 +81,8 @@ export function QRScanSection({ onScanComplete, onManualEntry }: QRScanSectionPr
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-        {/* QR Scanner Card */}
+        
+        {/* Tarjeta de Escáner QR (sin cambios) */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
@@ -109,7 +97,7 @@ export function QRScanSection({ onScanComplete, onManualEntry }: QRScanSectionPr
               </div>
             </div>
             <Button
-              onClick={() => onScanComplete("CAGE-001")}
+              onClick={() => onScanComplete("CAGE-001")} // Simula un escaneo exitoso
               className="w-full"
               size="lg"
             >
@@ -122,7 +110,7 @@ export function QRScanSection({ onScanComplete, onManualEntry }: QRScanSectionPr
           </CardContent>
         </Card>
 
-        {/* Generate QR Code Card (Updated with functionality) */}
+        {/* Tarjeta de Generación de QR (actualizada con funcionalidad) */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
@@ -131,7 +119,6 @@ export function QRScanSection({ onScanComplete, onManualEntry }: QRScanSectionPr
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 sm:space-y-6">
-            {/* Input for the Asset ID */}
             <div className="space-y-2">
               <Label htmlFor="assetId" className="text-sm sm:text-base">
                 Asset ID
@@ -148,7 +135,6 @@ export function QRScanSection({ onScanComplete, onManualEntry }: QRScanSectionPr
               />
             </div>
 
-            {/* Generate Button */}
             <Button 
               onClick={handleGenerateQrClick}
               disabled={isLoading}
@@ -159,14 +145,12 @@ export function QRScanSection({ onScanComplete, onManualEntry }: QRScanSectionPr
               {isLoading ? 'Generating...' : 'Generate QR'}
             </Button>
 
-            {/* Error Message Display */}
             {error && (
               <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg text-center text-sm">
                 <p>{error}</p>
               </div>
             )}
 
-            {/* QR Code Result Display */}
             {qrCodeUrl && (
               <div className="bg-muted/50 p-4 rounded-lg flex flex-col items-center space-y-4 animate-fade-in">
                 <h3 className="text-sm font-semibold text-foreground">QR Generated Successfully!</h3>
@@ -186,7 +170,7 @@ export function QRScanSection({ onScanComplete, onManualEntry }: QRScanSectionPr
 
       </div>
 
-      {/* Quick Asset Lookup Section */}
+      {/* Sección de Búsqueda Rápida de Activos */}
       <div className="mt-8 sm:mt-12">
         <Card className="border-2">
           <CardHeader className="text-center">

@@ -1527,6 +1527,16 @@
     border-color: #0000;
   }
 
+  .border-white\/20 {
+    border-color: #fff3;
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .border-white\/20 {
+      border-color: color-mix(in oklab, var(--color-white) 20%, transparent);
+    }
+  }
+
   .border-t-transparent {
     border-top-color: #0000;
   }
@@ -1635,6 +1645,10 @@
 
   .bg-transparent {
     background-color: #0000;
+  }
+
+  .bg-white {
+    background-color: var(--color-white);
   }
 
   .fill-current {
@@ -1985,10 +1999,6 @@
     font-variant-numeric: var(--tw-ordinal, ) var(--tw-slashed-zero, ) var(--tw-numeric-figure, ) var(--tw-numeric-spacing, ) var(--tw-numeric-fraction, );
   }
 
-  .underline {
-    text-decoration-line: underline;
-  }
-
   .underline-offset-4 {
     text-underline-offset: 4px;
   }
@@ -2079,6 +2089,11 @@
   .outline {
     outline-style: var(--tw-outline-style);
     outline-width: 1px;
+  }
+
+  .blur {
+    --tw-blur: blur(8px);
+    filter: var(--tw-blur, ) var(--tw-brightness, ) var(--tw-contrast, ) var(--tw-grayscale, ) var(--tw-hue-rotate, ) var(--tw-invert, ) var(--tw-saturate, ) var(--tw-sepia, ) var(--tw-drop-shadow, );
   }
 
   .filter {
@@ -2580,6 +2595,18 @@
   }
 
   @media (hover: hover) {
+    .hover\:bg-white\/20:hover {
+      background-color: #fff3;
+    }
+
+    @supports (color: color-mix(in lab, red, red)) {
+      .hover\:bg-white\/20:hover {
+        background-color: color-mix(in oklab, var(--color-white) 20%, transparent);
+      }
+    }
+  }
+
+  @media (hover: hover) {
     .hover\:text-accent-foreground:hover {
       color: var(--accent-foreground);
     }
@@ -2606,6 +2633,12 @@
   @media (hover: hover) {
     .hover\:text-sidebar-accent-foreground:hover {
       color: var(--sidebar-accent-foreground);
+    }
+  }
+
+  @media (hover: hover) {
+    .hover\:text-white:hover {
+      color: var(--color-white);
     }
   }
 
@@ -4562,23 +4595,23 @@
   --font-size: 16px;
   --background: #fff;
   --foreground: oklch(.145 0 0);
-  --card: #fff;
+  --card: #f2f3f4;
   --card-foreground: oklch(.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(.145 0 0);
-  --primary: #e91c24;
+  --primary: #ad050c;
   --primary-foreground: #fff;
   --secondary: oklch(.95 .0058 264.53);
-  --secondary-foreground: #e91c24;
-  --muted: #ececf0;
+  --secondary-foreground: #ad050c;
+  --muted: #f2f3f4;
   --muted-foreground: #717182;
-  --accent: #e9ebef;
-  --accent-foreground: #e91c24;
+  --accent: #f2f3f4;
+  --accent-foreground: #ad050c;
   --destructive: #d4183d;
   --destructive-foreground: #fff;
   --border: #0000001a;
   --input: transparent;
-  --input-background: #f3f3f5;
+  --input-background: #f2f3f4;
   --switch-background: #cbced4;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
@@ -4591,7 +4624,7 @@
   --radius: .625rem;
   --sidebar: oklch(.985 0 0);
   --sidebar-foreground: oklch(.145 0 0);
-  --sidebar-primary: #e91c24;
+  --sidebar-primary: #ad050c;
   --sidebar-primary-foreground: oklch(.985 0 0);
   --sidebar-accent: oklch(.97 0 0);
   --sidebar-accent-foreground: oklch(.205 0 0);
@@ -4602,18 +4635,18 @@
 .dark {
   --background: oklch(.145 0 0);
   --foreground: oklch(.985 0 0);
-  --card: oklch(.145 0 0);
-  --card-foreground: oklch(.985 0 0);
+  --card: #f2f3f4;
+  --card-foreground: oklch(.145 0 0);
   --popover: oklch(.145 0 0);
   --popover-foreground: oklch(.985 0 0);
-  --primary: #e91c24;
+  --primary: #ad050c;
   --primary-foreground: #fff;
   --secondary: oklch(.269 0 0);
   --secondary-foreground: oklch(.985 0 0);
-  --muted: oklch(.269 0 0);
-  --muted-foreground: oklch(.708 0 0);
-  --accent: oklch(.269 0 0);
-  --accent-foreground: oklch(.985 0 0);
+  --muted: #f2f3f4;
+  --muted-foreground: #717182;
+  --accent: #f2f3f4;
+  --accent-foreground: oklch(.145 0 0);
   --destructive: oklch(.396 .141 25.723);
   --destructive-foreground: oklch(.637 .237 25.331);
   --border: oklch(.269 0 0);
@@ -4628,7 +4661,7 @@
   --chart-5: oklch(.645 .246 16.439);
   --sidebar: oklch(.205 0 0);
   --sidebar-foreground: oklch(.985 0 0);
-  --sidebar-primary: #e91c24;
+  --sidebar-primary: #ad050c;
   --sidebar-primary-foreground: oklch(.985 0 0);
   --sidebar-accent: oklch(.269 0 0);
   --sidebar-accent-foreground: oklch(.985 0 0);
@@ -4962,16 +4995,3 @@ html {
     opacity: 0;
   }
 }
-
-/* --- Start: Custom animation migrated from the old project --- */
-/* This animation is used to smoothly display the generated QR code. */
-@layer utilities {
-  @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-  }
-  .animate-fade-in {
-    animation: fadeIn 0.5s ease-out forwards;
-  }
-}
-/* --- End: Custom animation --- */

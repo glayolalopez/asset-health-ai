@@ -149,18 +149,10 @@ export function AssetDetailSection({ assetId, onBack, onReportIssue }: AssetDeta
               </div>
 
               <div className="flex items-start gap-3">
-                <Package className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
-                <div className="min-w-0 flex-1">
-                  <h4 className="text-sm sm:text-base font-medium">Assets Remaining</h4>
-                  <p className="text-muted-foreground text-sm sm:text-base">7 units in stock</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
                 <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground mt-0.5 flex-shrink-0" />
                 <div className="min-w-0 flex-1">
-                  <h4 className="text-sm sm:text-base font-medium">Last Maintenance</h4>
-                  <p className="text-muted-foreground text-sm sm:text-base">30 Aug 2025</p>
+                  <h4 className="text-sm sm:text-base font-medium">Install Date</h4>
+                  <p className="text-muted-foreground text-sm sm:text-base">Sep 2020</p>
                 </div>
               </div>
             </CardContent>
