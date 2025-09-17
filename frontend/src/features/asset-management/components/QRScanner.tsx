@@ -1,18 +1,20 @@
-// /src/components/QRScanSection.tsx
+// src/features/asset-management/components/QRScanner.tsx
 
 import { useState } from "react";
 import { QrCode, Scan, Plus, Search } from "lucide-react";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-interface QRScanSectionProps {
+interface QRScannerProps {
   onScanComplete: (assetId: string) => void;
-  onManualEntry?: () => void; // Prop opcional para la entrada manual
+  onManualEntry?: () => void;
 }
 
-// Un componente SVG reutilizable para indicar estados de carga.
+/**
+ * A reusable SVG spinner component for indicating loading states.
+ */
 const LoadingSpinner = () => (
   <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -20,25 +22,26 @@ const LoadingSpinner = () => (
   </svg>
 );
 
-export function QRScanSection({ onScanComplete, onManualEntry }: QRScanSectionProps) {
-  // Estado para la funcionalidad de Búsqueda Rápida.
+/**
+ * Provides a comprehensive UI for asset interaction via QR codes.
+ * It includes functionalities for scanning, generating QR codes for new assets,
+ * and performing a quick lookup by asset ID.
+ */
+export function QRScanner({ onScanComplete, onManualEntry }: QRScannerProps) {
   const [quickLookupId, setQuickLookupId] = useState("");
+  const [assetId, setAssetId] = useState('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
 
-  // --- Lógica para la generación de QR ---
-  const [assetId, setAssetId] = useState(''); // Almacena la entrada del usuario para el generador.
-  const [isLoading, setIsLoading] = useState<boolean>(false); // Gestiona el estado de carga del formulario.
-  const [error, setError] = useState<string | null>(null); // Almacena cualquier mensaje de error.
-  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null); // Almacena la URL de la imagen del QR generado.
-
-  // URL del webhook de n8n para la generación de códigos QR.
+  // n8n webhook URL for QR code generation.
   const N8N_WEBHOOK_URL = "http://localhost:5678/webhook/55f3e5d2-0690-4584-8359-2c21108621bf";
 
-  // Maneja el envío del formulario para generar el QR.
   const handleGenerateQrClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     
     if (!assetId) {
-      setError("El Asset ID no puede estar vacío.");
+      setError("Asset ID cannot be empty.");
       return;
     }
     
@@ -49,7 +52,7 @@ export function QRScanSection({ onScanComplete, onManualEntry }: QRScanSectionPr
     try {
       const response = await fetch(`${N8N_WEBHOOK_URL}?assetId=${assetId}`);
       if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status}. El activo podría no existir.`);
+        throw new Error(`HTTP Error: ${response.status}. The asset might not exist.`);
       }
       const imageBlob = await response.blob();
       const imageUrl = URL.createObjectURL(imageBlob);
@@ -61,17 +64,14 @@ export function QRScanSection({ onScanComplete, onManualEntry }: QRScanSectionPr
     }
   };
   
-  // Manejador para el botón de entrada manual.
   const handleManualEntryClick = () => {
     if (onManualEntry) {
       onManualEntry();
     } else {
-      // Fallback si la prop no se proporciona.
-      alert("Aquí se abriría el formulario de entrada manual.");
+      alert("Manual entry form would open here.");
     }
   };
 
-  // Manejador para la búsqueda rápida.
   const handleQuickLookup = () => {
     if (quickLookupId.trim()) {
       onScanComplete(quickLookupId.trim());
@@ -82,7 +82,7 @@ export function QRScanSection({ onScanComplete, onManualEntry }: QRScanSectionPr
     <div className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
         
-        {/* Tarjeta de Escáner QR (sin cambios) */}
+        {/* QR Scanner Card */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
@@ -97,7 +97,7 @@ export function QRScanSection({ onScanComplete, onManualEntry }: QRScanSectionPr
               </div>
             </div>
             <Button
-              onClick={() => onScanComplete("CAGE-001")} // Simula un escaneo exitoso
+              onClick={() => onScanComplete("CAGE-001")} // Simulates a successful scan
               className="w-full"
               size="lg"
             >
@@ -110,7 +110,7 @@ export function QRScanSection({ onScanComplete, onManualEntry }: QRScanSectionPr
           </CardContent>
         </Card>
 
-        {/* Tarjeta de Generación de QR (actualizada con funcionalidad) */}
+        {/* QR Generation Card */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
@@ -170,7 +170,7 @@ export function QRScanSection({ onScanComplete, onManualEntry }: QRScanSectionPr
 
       </div>
 
-      {/* Sección de Búsqueda Rápida de Activos */}
+      {/* Quick Asset Lookup Section */}
       <div className="mt-8 sm:mt-12">
         <Card className="border-2">
           <CardHeader className="text-center">

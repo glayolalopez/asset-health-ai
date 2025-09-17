@@ -5,27 +5,30 @@ import {
   Settings, 
   Calendar, 
   Brain, 
-  Package,
   ArrowLeft,
   Edit,
   History,
   Download
 } from "lucide-react";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { Progress } from "./ui/progress";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 
-interface AssetDetailSectionProps {
+interface AssetDetailProps {
   assetId: string;
   onBack: () => void;
   onReportIssue: () => void;
 }
 
-export function AssetDetailSection({ assetId, onBack, onReportIssue }: AssetDetailSectionProps) {
+/**
+ * Renders the detailed view of a specific asset, including its status,
+ * lifecycle, AI recommendations, and available actions.
+ */
+export function AssetDetail({ assetId, onBack, onReportIssue }: AssetDetailProps) {
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
-      {/* Header */}
+      {/* Header Section */}
       <div className="mb-6 sm:mb-8">
         <div className="flex flex-col gap-4 mb-4">
           <div className="flex items-center gap-3 sm:gap-4">
@@ -34,6 +37,7 @@ export function AssetDetailSection({ assetId, onBack, onReportIssue }: AssetDeta
               size="sm"
               onClick={onBack}
               className="p-2 flex-shrink-0"
+              aria-label="Go back"
             >
               <ArrowLeft className="w-4 h-4" />
             </Button>

@@ -1,50 +1,43 @@
+// src/App.tsx
 import { useState } from "react";
-import { Navigation } from "./components/Navigation";
-import { QRScanSection } from "./components/QRScanSection";
-import { AssetDetailSection } from "./components/AssetDetailSection";
-import { Dashboard } from "./components/Dashboard";
-type View = "scan" | "details" | "dashboard" | "reports" | "settings";
+import { Navigation } from "@/components/common/Navigation";
+import DashboardPage from "@/pages/DashboardPage";
+import AssetDetailPage from "@/pages/AssetDetailPage";
+import QRScanPage from "@/pages/QRScanPage";
+import ManualEntryPage from "@/pages/ManualEntryPage";
 
+// Define the possible views/pages in the application.
+type View = "dashboard" | "scan" | "details" | "entry" | "reports" | "settings";
+
+/**
+ * Main application component.
+ * Handles view routing and renders the appropriate page.
+ */
 export default function App() {
+  // State to manage the current active view. Defaults to 'dashboard'.
   const [currentView, setCurrentView] = useState<View>("dashboard");
-  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
 
-  const handleScanComplete = (assetId: string) => {
-    setSelectedAssetId(assetId);
-    setCurrentView("details");
-  };
-
-  const handleReportIssue = () => {
-    // In a real app, this would navigate to an issue reporting form
-    alert("Report issue functionality would be implemented here");
-  };
-
+  /**
+   * Handles navigation between different views.
+   * @param view The view to navigate to.
+   */
   const handleNavigate = (view: string) => {
     setCurrentView(view as View);
   };
 
-  const handleBackToScan = () => {
-    setCurrentView("scan");
-    setSelectedAssetId(null);
-  };
-
-
-
+  /**
+   * Renders the main content based on the current view state.
+   */
   const renderContent = () => {
     switch (currentView) {
-      case "scan":
-        return <QRScanSection onScanComplete={handleScanComplete} />;
-      case "details":
-        return (
-          <AssetDetailSection 
-            assetId={selectedAssetId || "UNKNOWN"} 
-            onReportIssue={handleReportIssue} 
-            onBack={handleBackToScan}
-          />
-        );
-
       case "dashboard":
-        return <Dashboard />;
+        return <DashboardPage />;
+      case "scan":
+        return <QRScanPage />;
+      case "details":
+        return <AssetDetailPage />;
+      case "entry":
+        return <ManualEntryPage />;
       case "reports":
         return (
           <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
@@ -60,13 +53,17 @@ export default function App() {
           </div>
         );
       default:
-        return <Dashboard />;
+        // Fallback to the dashboard view.
+        return <DashboardPage />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground">
+      {/* The main navigation component */}
       <Navigation currentView={currentView} onNavigate={handleNavigate} />
+      
+      {/* The main content area */}
       <main className="flex-1">
         {renderContent()}
       </main>

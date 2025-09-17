@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { SquareActivity, QrCode, FileText, Settings, Menu, X } from "lucide-react";
-import { Button } from "./ui/button";
-import gradientBackground from "figma:asset/6bd48d86654bce1db831d2562ca2d8e0b37b4902.png";
+import { Button } from "@/components/ui/button";
+import gradientBackground from "@/assets/6bd48d86654bce1db831d2562ca2d8e0b37b4902.png";
 
 interface NavigationProps {
   currentView: string;
