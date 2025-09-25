@@ -35,7 +35,7 @@ export function QRScanner({ onScanComplete, onManualEntry }: QRScannerProps) {
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
 
   // n8n webhook URL for QR code generation.
-  const N8N_WEBHOOK_URL = "http://localhost:5678/webhook/55f3e5d2-0690-4584-8359-2c21108621bf";
+  const N8N_WEBHOOK_URL = "http://localhost:5678/webhook/03e70034-2ce7-490a-95b3-56547b70f9ce";
 
   const handleGenerateQrClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
