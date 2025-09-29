@@ -1,0 +1,190 @@
+{
+  "name": "CreateLabel Maximo",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "03e70034-2ce7-490a-95b3-56547b70f9ce",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        688,
+        -16
+      ],
+      "id": "e8153cf4-ed8b-4d35-ba81-46557c780df9",
+      "name": "Webhook",
+      "webhookId": "03e70034-2ce7-490a-95b3-56547b70f9ce"
+    },
+    {
+      "parameters": {
+        "url": "https://api.qrserver.com/v1/create-qr-code/",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "Size",
+              "value": "250x250"
+            },
+            {
+              "name": "data",
+              "value": "={{ JSON.stringify($json) }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1248,
+        -16
+      ],
+      "id": "faed8c02-2560-4a96-8740-55b44b845ee0",
+      "name": "Create QR"
+    },
+    {
+      "parameters": {
+        "respondWith": "binary",
+        "responseDataSource": "set",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "image/png"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1392,
+        -16
+      ],
+      "id": "d08a2d09-7a88-4c68-a0de-5ca845ffa65e",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/files/Maximo Asset Data.xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        832,
+        -16
+      ],
+      "id": "ba789a2a-8218-4158-8543-9d15c464a614",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        976,
+        -16
+      ],
+      "id": "ad5cf334-1a4f-4202-82a7-d74f049a0f94",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtiene el ID del activo a buscar desde los parámetros de la URL del webhook.\nconst assetIdToFind = $('Webhook').first().json.query.assetId;\n\n// Obtiene todos los items de entrada que llegan a este nodo.\nconst allItems = $input.all();\n\n// Prepara un array para guardar el resultado final.\nconst results = [];\n\n// Encuentra el único item en el array cuyo \"Asset ID\" coincida con el del webhook.\n// El método .find() es eficiente para encontrar la primera coincidencia.\n// Se ha actualizado 'item.json.ASSETID' a 'item.json[\"Asset ID\"]' para que coincida con el nuevo nombre de la columna.\nconst matchedItem = allItems.find(item => item.json[\"Asset ID\"] === assetIdToFind);\n\n// Comprueba si realmente se encontró un item coincidente antes de intentar acceder a sus datos.\nif (matchedItem) {\n\n  // Si se encuentra una coincidencia, crea un nuevo objeto con los campos que necesitamos del nuevo Excel.\n  results.push({\n    json: {\n      // --- Información del Activo ---\n      region: matchedItem.json[\"Region\"],\n      assetType: matchedItem.json[\"Asset Type\"],\n      modBy: matchedItem.json[\"Mod By\"],\n      siteID: matchedItem.json[\"Site ID\"],\n      assetID: matchedItem.json[\"Asset ID\"],\n      assetUID: matchedItem.json[\"Asset UID\"],\n      assetDescription: matchedItem.json[\"Asset Description\"],\n      classification: matchedItem.json[\"Classification\"],\n      status: matchedItem.json[\"Status\"],\n      \n      // --- Información de Ubicación y Modelo ---\n      locID: matchedItem.json[\"LOC ID\"],\n      locationDescription: matchedItem.json[\"Location Description\"],\n      modelNumber: matchedItem.json[\"Model #\"],\n      serialNumber: matchedItem.json[\"Serial#\"],\n\n      // --- Información de Coste y Vida Útil ---\n      purchasePrice: matchedItem.json[\"Purchase Price (Estimated)\"],\n      replaceCost: matchedItem.json[\"Replace Cost (Estimated)\"],\n      currency: matchedItem.json[\"Currency\"],\n      installDate: matchedItem.json[\"Install Date\"],\n      lifeExpectancy: matchedItem.json[\"Life Expectancy (# of Years)\"],\n      siteEndOfLifeDate: matchedItem.json[\"Site End Of Life Date\"],\n      // --- Valor Predicho ---\n      predictedLifeExpectancy: matchedItem.json[\"Predicted Life Expectancy\"]\n    }\n  });\n}\n\n// Devuelve el array final.\n// Contendrá un único item si se encontró una coincidencia, o estará vacío si no se encontró ninguna.\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        -16
+      ],
+      "id": "fb59267d-4d23-45e8-aa4d-2cde48dc4740",
+      "name": "Find Asset"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create QR": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Find Asset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Asset": {
+      "main": [
+        [
+          {
+            "node": "Create QR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c3234bff-e6fc-4a26-b82f-f1b654b9ba7c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0fb70fb450834a777d8b0088b348df73a8d452f81e5fc37eafd491d3f470d7d1"
+  },
+  "id": "sXK4TqcSamHfWLUK",
+  "tags": []
+}
